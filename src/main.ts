@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { setupSwagger } from './config/swagger.config';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -18,6 +19,9 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
+  
+  // Configurar Swagger para documentación de la API
+  setupSwagger(app);
   
   const port = process.env.PORT || 3000;
   await app.listen(port);
