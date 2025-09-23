@@ -1,5 +1,9 @@
+import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+
+// Cargar variables de entorno
+dotenv.config();
 
 /**
  * Función principal que inicializa la aplicación NestJS
