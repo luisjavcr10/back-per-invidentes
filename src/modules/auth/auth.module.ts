@@ -7,6 +7,7 @@ import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { User } from '../usuarios/entities/user.entity';
+import { UsersModule } from '../usuarios/users.module';
 
 /**
  * Módulo de autenticación que maneja login, registro y validación JWT
@@ -15,6 +16,7 @@ import { User } from '../usuarios/entities/user.entity';
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule,
+    UsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

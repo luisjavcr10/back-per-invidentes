@@ -16,13 +16,24 @@ export class AuthController {
   /**
    * Endpoint para registrar un nuevo usuario
    * @param registerDto Datos del usuario a registrar
-   * @returns Usuario creado y token de acceso
+   * @returns Respuesta estructurada con success, mensaje, usuario y token
    */
   @ApiOperation({ summary: 'Registrar nuevo usuario', description: 'Crea una nueva cuenta de usuario en el sistema' })
   @ApiBody({ type: RegisterDto, description: 'Datos del usuario a registrar' })
-  @ApiResponse({ status: 201, description: 'Usuario registrado exitosamente' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Respuesta del registro',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', description: 'Indica si la operación fue exitosa' },
+        message: { type: 'string', description: 'Mensaje descriptivo del resultado' },
+        user: { type: 'object', description: 'Datos del usuario (null si error)' },
+        access_token: { type: 'string', description: 'Token JWT (null si error)' }
+      }
+    }
+  })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
-  @ApiResponse({ status: 409, description: 'El email ya está registrado' })
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
@@ -31,12 +42,23 @@ export class AuthController {
   /**
    * Endpoint para autenticar un usuario
    * @param loginDto Credenciales de login
-   * @returns Usuario y token de acceso
+   * @returns Respuesta estructurada con success, mensaje, usuario y token
    */
   @ApiOperation({ summary: 'Iniciar sesión', description: 'Autentica un usuario y devuelve un token JWT' })
   @ApiBody({ type: LoginDto, description: 'Credenciales de acceso' })
-  @ApiResponse({ status: 200, description: 'Login exitoso, devuelve usuario y token' })
-  @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Respuesta del login',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', description: 'Indica si la operación fue exitosa' },
+        message: { type: 'string', description: 'Mensaje descriptivo del resultado' },
+        user: { type: 'object', description: 'Datos del usuario (null si error)' },
+        access_token: { type: 'string', description: 'Token JWT (null si error)' }
+      }
+    }
+  })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
