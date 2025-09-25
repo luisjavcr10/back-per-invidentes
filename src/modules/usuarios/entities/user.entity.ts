@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { UserRole } from './user-role.entity';
 
 /**
  * Entidad Usuario para personas invidentes
@@ -41,6 +42,12 @@ export class User {
    */
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
+
+  /**
+   * Relación con la tabla intermedia UserRole
+   */
+  @OneToMany(() => UserRole, userRole => userRole.user)
+  userRoles: UserRole[];
 
   /**
    * Fecha de creación del registro
