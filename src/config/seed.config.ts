@@ -1,6 +1,10 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from '../modules/usuarios/entities/user.entity';
+import { Role } from '../modules/usuarios/entities/role.entity';
+import { UserRole } from '../modules/usuarios/entities/user-role.entity';
+import { Permission } from '../modules/usuarios/entities/permission.entity';
+import { RolePermission } from '../modules/usuarios/entities/role-permission.entity';
 import * as dotenv from 'dotenv';
 
 // Cargar variables de entorno
@@ -16,7 +20,7 @@ export class SeedConfig {
     const seedConfig: DataSourceOptions = {
       type: 'postgres',
       url: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/per_invidentes_db',
-      entities: [User],
+      entities: [User, Role, UserRole, Permission, RolePermission],
       synchronize: false,
       ssl: { rejectUnauthorized: false }
     };
@@ -50,6 +54,8 @@ export class SeedConfig {
       await this.initialize();
       
       const userRepository = this.dataSource.getRepository(User);
+      const roleRepository = this.dataSource.getRepository(Role);
+      const userRoleRepository = this.dataSource.getRepository(UserRole);
       
       // Verificar si ya existe un admin
       const existingAdmin = await userRepository.findOne({
@@ -59,6 +65,16 @@ export class SeedConfig {
       if (existingAdmin) {
         console.log('✅ Usuario administrador ya existe');
         return;
+      }
+      
+      // Buscar el rol de administrador
+      const adminRole = await roleRepository.findOne({
+        where: { name: 'administrador' }
+      });
+      
+      if (!adminRole) {
+        console.log('⚠️  Rol de administrador no encontrado. Asegúrate de ejecutar el seed de roles primero.');
+        throw new Error('Rol de administrador no encontrado');
       }
       
       // Crear usuario administrador
@@ -72,11 +88,21 @@ export class SeedConfig {
         isActive: true
       });
       
-      await userRepository.save(adminUser);
+      const savedAdminUser = await userRepository.save(adminUser);
+      
+      // Asignar rol de administrador al usuario
+      const userRole = userRoleRepository.create({
+        userId: savedAdminUser.id,
+        roleId: adminRole.id,
+        isActive: true
+      });
+      
+      await userRoleRepository.save(userRole);
       
       console.log('🚀 Usuario administrador creado exitosamente:');
       console.log('   Email: admin@perinvidentes.com');
       console.log('   Password: admin123456');
+      console.log('   Rol: administrador');
       console.log('   ⚠️  Recuerda cambiar la contraseña después del primer login');
       
     } catch (error) {

@@ -1,15 +1,10 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType, OmitType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsOptional, IsBoolean } from 'class-validator';
 
 /**
  * DTO para actualizar un usuario existente
+ * Excluye roleIds ya que los roles se manejan por separado
  */
-export class UpdateUserDto extends PartialType(CreateUserDto) {
-  /**
-   * Estado activo del usuario
-   */
-  @IsOptional()
-  @IsBoolean()
-  activo?: boolean;
-}
+export class UpdateUserDto extends PartialType(
+  OmitType(CreateUserDto, ['roleIds'] as const)
+) {}
